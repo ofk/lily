@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>bench</title>
+</head>
+<body>
+<script type="text/javascript">
+
+var nextTicks = {
+	setTimeout: function (fn) {
+		setTimeout(fn, 0);
+	},
+	image: document.addEventListener && function (fn) {
+		var img = new Image;
+		img.addEventListener('load', handler, false);
+		img.addEventListener('error', handler, false);
+		function handler() {
+			img.removeEventListener('load', handler, false);
+			img.removeEventListener('error', handler, false);
+			fn();
+		}
+		img.src = 'data:image/png,' + Math.random();
+	},
+	script: function (fn) {
+		var script = document.createElement('script');
+		var loaded = false;
+		script.type = 'text/javascript';
+		script.src  = 'data:text/javascript,';
+		script.onreadystatechange = script.onload = script.onerror = function () {
+			if (!loaded) {
+				loaded = true;
+				script.onreadystatechange = script.onload = script.onerror = null;
+				document.body.removeChild(script);
+				fn();
+			}
+		};
+		document.body.appendChild(script);
+	}
+};
+
+for (var name in nextTicks) {
+	nextTicks[name] && (function (name, nextTick) {
+		var p = document.body.appendChild(document.createElement('p'));
+		p.appendChild(document.createTextNode(name + ': '));
+		var i = 100, start = new Date;
+		nextTick(function f() {
+			if (!--i) {
+				var ms = new Date - start;
+				p.appendChild(document.createTextNode(ms + ' ms'));
+			}
+			else {
+				nextTick(f);
+			}
+		});
+	}(name, nextTicks[name]));
+}
+
+</script>
+</body>
+</html>

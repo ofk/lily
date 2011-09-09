@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>bench</title>
+</head>
+<body>
+<script type="text/javascript">
+
+var nextTicks = {
+	setTimeout: function (fn) {
+		setTimeout(fn, 0);
+	},
+	image: document.addEventListener && function (fn) {
+		var img = new Image;
+		img.addEventListener('load', handler, false);
+		img.addEventListener('error', handler, false);
+		function handler() {
+			img.removeEventListener('load', handler, false);
+			img.removeEventListener('error', handler, false);
+			fn();
+		}
+		img.src = 'data:image/png,' + Math.random();
+	},
+	script: function (fn) {
+		var script = document.createElement('script');
+		var loaded = false;
+		script.type = 'text/javascript';
+		script.src  = 'data:text/javascript,';
+		script.onreadystatechange = script.onload = script.onerror = function () {
+			if (!loaded) {
+				loaded = true;
+				script.onreadystatechange = script.onload = script.onerror = null;
+				document.body.removeChild(script);
+				fn();
+			}
+		};
+		document.body.appendChild(script);
+	}
+};
+
+for (var name in nextTicks) {
+	nextTicks[name] && (function (name, nextTick) {
+		var p = document.body.appendChild(document.createElement('p'));
+		p.appendChild(document.createTextNode(name + ': '));
+		var c = 0, min = 0x7fffffff, max = -1, avg = 0, lim = 100;
+		for (var i = 0; i < lim; ++i) {
+			(function () {
+				var start = new Date;
+				nextTick(function f() {
+					var ms = new Date - start;
+					++c;
+					avg += ms;
+					if (min > ms) {
+						min = ms;
+					}
+					if (max < ms) {
+						max = ms;
+					}
+					if (lim === c) {
+						p.appendChild(document.createTextNode([
+							'count: ' + c,
+							'avg: ' + (avg / c),
+							'min: ' + min,
+							'max: ' + max
+						].join(', ')));
+					}
+				});
+			}());
+		}
+	}(name, nextTicks[name]));
+}
+
+</script>
+</body>
+</html>
