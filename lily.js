@@ -2,7 +2,7 @@
  * @fileOverview
  *   This file has features related to development of applications in JavaScript.
  * @author <a href="http://0fk.org/">ofk</a>
- * @version 0.1
+ * @version 0.1.1
  * @license
  *   lily.js a.k.a. LIght LibrarY JavaScript (c) 2011 ofk
  *   lily is licensed under the MIT.
@@ -21,11 +21,12 @@ var ll = (function () { //< Expose ll to the global object.
 // -----------------------------------------------------------------------------
 // Cache of native objects.
 
-var _TypeError = TypeError,
-    _Date      = Date,
-    _isFinite  = isFinite;
-
 //@vars
+
+var _TypeError   = TypeError,
+    _Date        = Date,
+    _isFinite    = isFinite,
+    _Array_slice = Array.prototype.slice;
 
 // -----------------------------------------------------------------------------
 // All public classes and functions will be attached to the ll.
@@ -341,17 +342,70 @@ llSlot.createHandle = function createHandle() {
 	}
 	// The queue of handlers
 	llon._llqueue = [];
+
+	return llSlot.extendHandler(llon, llon._llqueue);
+};
+
+/**
+ * Create a function to be able to manage filters.
+ *
+ * @example
+ * f = llSlot.createFilter();
+ * f.attach(function (v) { return v + 1; });
+ * f.attach(function (v) { return v + 2; });
+ * f(1); // 4
+ *
+ * @memberOf ll.Slot
+ * @name createHandle
+ * @returns {Function} The handle function.
+ */
+llSlot.createFilter = function createHandle() {
+	// Executes contained filters.
+	function llfl() {
+		var q = llfl._llqueue,
+		    args = _Array_slice.call(arguments);
+
+		// Execute filters
+		for (var i = 0, iz = q.length; i < iz; ++i) {
+			args[0] = q[i].apply(this, args);
+		}
+
+		return args[0];
+	}
+	// The queue of filters
+	llfl._llqueue = [];
+
+	return llSlot.extendHandler(llfl, llfl._llqueue);
+};
+
+/**
+ * Create a function to be able to manage handlers.
+ *
+ * @example
+ * function fn() {}
+ * queue = [];
+ * llSlot.extendHandler(fn, queue);
+ * fn.attach; // function
+ * fn.detach; // function
+ *
+ * @memberOf ll.Slot
+ * @name extendHandler
+ * @param {Function} hn A handler is extended features.
+ * @param {Array} queue A queue of a handler.
+ * @returns {Function} An extended handler.
+ */
+llSlot.extendHandler = function (hn, queue) {
 	// Attach a handler to the function.
 	// @example
 	// slt.onfunc.attach(function () { .. });
 	// @param {Function} fn A function to execute each time the handle is triggered.
-	llon.attach = function attach(fn) {
+	hn.attach = function attach(fn) {
 		if (lltype(fn) !== 'function') {
 			throw new _TypeError('first argument type should be function.');
 		}
 		llguid(fn); //< fetch guid
 		// Add a function to the queue
-		var q = this._llqueue;
+		var q = queue;
 		q[q.length] = fn; //< faster push
 	};
 	// Remove a previously-attached handler from the function.
@@ -361,13 +415,13 @@ llSlot.createHandle = function createHandle() {
 	// slt.onfunc.detach(f);
 	// @param {Function|Number} [guid] A function that is to be no longer executed, or a guid of the function.
 	// @returns {Boolean} Whether succeeded of removal.
-	llon.detach = function detach(guid) {
+	hn.detach = function detach(guid) {
 		// Get a guid of the function
 		if (lltype(guid) === 'function') {
 			guid = llguid(guid);
 		}
 		// Remove the function from the queue
-		var q = this._llqueue;
+		var q = queue;
 		for (var i = 0, iz = q.length; i < iz; ++i) {
 			// Remove the function found first
 			if (guid === llguid(q[i])) {
@@ -377,7 +431,7 @@ llSlot.createHandle = function createHandle() {
 		}
 		return false;
 	};
-	return llon;
+	return hn;
 };
 
 llmerge(llSlot.prototype, /** @lends ll.Slot# */ {
@@ -463,7 +517,7 @@ llmerge(llSlot.prototype, /** @lends ll.Slot# */ {
 
 		var f = that[name];
 		if (f && lltype(f) === 'function') {
-			return f.apply(that, Array.prototype.slice.call(arguments, 1));
+			return f.apply(that, _Array_slice.call(arguments, 1));
 		}
 	}
 });
