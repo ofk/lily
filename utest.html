@@ -253,6 +253,42 @@ utest('ll.Slot', [
 		var old_sum = sum;
 		slt1.ontest3(3, 4);
 		return [[ old_sum, 25 ], [ sum, 76 ]];
+	},
+	function () {
+		var sum = 0;
+		var f = ll.Slot.createHandle();
+		f.attach(function () { sum += 1; });
+		f.attach(function () { sum += 2; });
+		f.attach(function () { sum += 3; });
+		f.attach(function () { sum += 4; });
+		f();
+		return [[ sum, 10 ]];
+	},
+	function () {
+		var sum = 0;
+		slt1.ontest4 = ll.Slot.createHandle();
+		slt1.attach('test4', function () { sum += 1; });
+		slt1.attach('test4', function () { sum += 2; });
+		slt1.attach('test4', function () { sum += 3; });
+		slt1.attach('test4', function () { sum += 4; });
+		slt1.ontest4();
+		return [[ sum, 10 ]];
+	},
+	function () {
+		var f = ll.Slot.createFilter();
+		f.attach(function (v) { return v + 1; });
+		f.attach(function (v) { return v + 2; });
+		f.attach(function (v) { return v + 3; });
+		f.attach(function (v) { return v + 4; });
+		return [[ f(0), 10 ], [ f(10), 20 ]];
+	},
+	function () {
+		slt1.ontest5 = ll.Slot.createFilter();
+		slt1.attach('test5', function (v) { return v + 1; });
+		slt1.attach('test5', function (v) { return v + 2; });
+		slt1.attach('test5', function (v) { return v + 3; });
+		slt1.attach('test5', function (v) { return v + 4; });
+		return [[ slt1.ontest5(0), 10 ], [ slt1.ontest5(10), 20 ]];
 	}
 ]);
 

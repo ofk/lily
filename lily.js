@@ -314,7 +314,7 @@ function llSlot() {}
  * Create a function to be able to manage handlers.
  *
  * @example
- * f = llSlot.createHandle();
+ * f = ll.Slot.createHandle();
  * f.attach(function () { alert(1); });
  * f.attach(function () { alert(2); });
  * f(); // alert(1); alert(2);
@@ -356,10 +356,10 @@ llSlot.createHandle = function createHandle() {
  * f(1); // 4
  *
  * @memberOf ll.Slot
- * @name createHandle
+ * @name createFilter
  * @returns {Function} The handle function.
  */
-llSlot.createFilter = function createHandle() {
+llSlot.createFilter = function createFilter() {
 	// Executes contained filters.
 	function llfl() {
 		var q = llfl._llqueue,
@@ -379,7 +379,7 @@ llSlot.createFilter = function createHandle() {
 };
 
 /**
- * Create a function to be able to manage handlers.
+ * Extend a function to be able to manage callbacks.
  *
  * @example
  * function fn() {}
