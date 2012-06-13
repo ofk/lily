@@ -82,7 +82,7 @@ var ll = (function () { //< Expose ll to the global object
 		// create class
 		function Class() {
 			// called as a constructor
-			return this.init && this.init.apply(this, arguments);
+			this.init && this.init.apply(this, arguments);
 		}
 
 		// classical inheritance
@@ -1173,7 +1173,7 @@ var ll = (function () { //< Expose ll to the global object
 	llDeferred.nextTick =
 		// for cr, fx, ie (op doesn't work)
 		hasWindow && !window.opera
-	    && (doc = document)
+	    && (doc = _document)
 	    && (head = doc.head
 	        || doc.getElementsByTagName('head')[0]
 	        || doc.documentElement) ? function nextTickScript(fn) {
