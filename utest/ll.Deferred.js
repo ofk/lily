@@ -133,7 +133,7 @@ utest('ll.Deferred.then', [
 	},
 	function (test) {
 		dfr.then(function (_) { return dfr.then(function () { return 1; }); })
-		   .then(function (v) { test([ v, 1 ]) });
+		   .then(function (v) { test([ v, 1 ]); });
 	},
 	function (test) {
 		dfr.then(function () {
@@ -144,7 +144,7 @@ utest('ll.Deferred.then', [
 					});
 				});
 			});
-		}).then(function (v) { test([ v, 1 ]) });
+		}).then(function (v) { test([ v, 1 ]); });
 	},
 	function (test) {
 		dfr.then(function (_) { return 1; })
@@ -589,7 +589,7 @@ utest('ll.Deferred.each', [
 		var p = [];
 		dfr.each([ 1, 23, 456, 7890 ], function (v) { p.push(v||null); })
 		   .each([ 1, 23, 456, 7890 ], function (v) { p.push(v*2); })
-		   .each([ 1, 23, 456, 7890 ], function (v) { p.push(v*3); })
+		   .each([ 1, 23, 456, 7890 ], function (v) { p.push(v*3); });
 		test([ p, [1,23,456,7890,1*2,23*2,456*2,7890*2,1*3,23*3,456*3,7890*3] ], 1000);
 	},
 	function (test) {
@@ -609,7 +609,7 @@ utest('ll.Deferred.each', [
 		var p = [];
 		dfr.each([ 1, 23, 456, 7890 ], function (v) { p.push(v||null); })
 		   .each([ 1, 23, 456, 7890 ], function (v) { p.push(v*2); })
-		   .each([ 1, 23, 456, 7890 ], function (v) { p.push(v*3); })
+		   .each([ 1, 23, 456, 7890 ], function (v) { p.push(v*3); });
 		test([ p, [1,23,456,7890,1*2,23*2,456*2,7890*2,1*3,23*3,456*3,7890*3] ], 1000);
 	},
 	function (test) {

@@ -1,17 +1,21 @@
 var kvo1 = new ll.KVObject,
     kvo2 = new ll.KVObject,
     kvo3 = new ll.KVObject;
+
 // prop1: kvo1 -> kvo2 -> kvo3
 kvo1.bindTo('prop1', kvo2);
 kvo2.bindTo('prop1', kvo3);
+
 // prop2: kvo1 -> kvo2 <- remove
 //            `-> kvo3
 kvo1.bindTo('prop2', kvo2);
 kvo1.bindTo('prop2', kvo3);
+
 // prop3: kvo1 <- kvo2
 //            `<- kvo3
 kvo2.bindTo('prop3', kvo1);
 kvo3.bindTo('prop3', kvo1);
+
 // prop4: kvo1.prop4a -> kvo2.prop4a -> kvo2.prop4b -> kvo1.prop4b
 kvo1.bindTo('prop4a', kvo2);
 kvo2.bindTo('prop4a', kvo2, 'prop4b');

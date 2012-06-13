@@ -1,54 +1,44 @@
+utest('ll.Dispatch.parseUrl', function () {
+	var empty = /(a)?/.exec('b')[1];
+	function reg_test(res) {
+		return [ ll.Dispatch.parseUrl.exec(res[0]), res ];
+	}
 
-var empty = /(a)?/.exec('b')[1];
+	return [
+		// [ all, protocol, username, password, hostname, port, pathname, search, hash ]
+		reg_test([ '', empty, empty, empty, empty, empty, empty, empty, empty ]),
 
-utest('ll.Dispatch.parseUrl', [
-	// [ all, protocol, username, password, hostname, port, pathname, search, hash ]
-	[ ll.Dispatch.parseUrl.exec(''), [ '', empty, empty, empty, empty, empty, empty, empty, empty ] ],
-	[ ll.Dispatch.parseUrl.exec('protocol://username:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash'),
-	  [ 'protocol://username:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash',
-	    'protocol://', 'username', 'password', 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ] ],
+		reg_test([ 'protocol://username:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash',
+				   'protocol://', 'username', 'password', 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ]),
+		reg_test([ 'protocol://username:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value',
+				   'protocol://', 'username', 'password', 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', empty ]),
+		reg_test([ 'protocol://username:password@hostname.tld:80/pathname/dir/file.ext#hash',
+				   'protocol://', 'username', 'password', 'hostname.tld', '80', '/pathname/dir/file.ext', empty, '#hash' ]),
+		reg_test([ 'protocol://username:password@hostname.tld:80?search=query&key=value#hash',
+				   'protocol://', 'username', 'password', 'hostname.tld', '80', empty, '?search=query&key=value', '#hash' ]),
+		reg_test([ 'protocol://username:password@hostname.tld/pathname/dir/file.ext?search=query&key=value#hash',
+				   'protocol://', 'username', 'password', 'hostname.tld', empty, '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ]),
+		reg_test([ 'protocol://username:password@:80/pathname/dir/file.ext?search=query&key=value#hash',
+				   'protocol://', 'username', 'password', empty, '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ]),
+		reg_test([ 'protocol://username:@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash',
+				   'protocol://', 'username', empty, 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ]),
+		reg_test([ 'protocol://:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash',
+				   'protocol://', empty, 'password', 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ]),
+		reg_test([ '://username:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash',
+				   '://', 'username', 'password', 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ]),
 
-	[ ll.Dispatch.parseUrl.exec('protocol://username:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value'),
-	  [ 'protocol://username:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value',
-	    'protocol://', 'username', 'password', 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', empty ] ],
-	[ ll.Dispatch.parseUrl.exec('protocol://username:password@hostname.tld:80/pathname/dir/file.ext#hash'),
-	  [ 'protocol://username:password@hostname.tld:80/pathname/dir/file.ext#hash',
-	    'protocol://', 'username', 'password', 'hostname.tld', '80', '/pathname/dir/file.ext', empty, '#hash' ] ],
-	[ ll.Dispatch.parseUrl.exec('protocol://username:password@hostname.tld:80?search=query&key=value#hash'),
-	  [ 'protocol://username:password@hostname.tld:80?search=query&key=value#hash',
-	    'protocol://', 'username', 'password', 'hostname.tld', '80', empty, '?search=query&key=value', '#hash' ] ],
-	[ ll.Dispatch.parseUrl.exec('protocol://username:password@hostname.tld/pathname/dir/file.ext?search=query&key=value#hash'),
-	  [ 'protocol://username:password@hostname.tld/pathname/dir/file.ext?search=query&key=value#hash',
-	    'protocol://', 'username', 'password', 'hostname.tld', empty, '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ] ],
-	[ ll.Dispatch.parseUrl.exec('protocol://username:password@:80/pathname/dir/file.ext?search=query&key=value#hash'),
-	  [ 'protocol://username:password@:80/pathname/dir/file.ext?search=query&key=value#hash',
-	    'protocol://', 'username', 'password', empty, '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ] ],
-	[ ll.Dispatch.parseUrl.exec('protocol://username:@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash'),
-	  [ 'protocol://username:@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash',
-	    'protocol://', 'username', empty, 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ] ],
-	[ ll.Dispatch.parseUrl.exec('protocol://:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash'),
-	  [ 'protocol://:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash',
-	    'protocol://', empty, 'password', 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ] ],
-	[ ll.Dispatch.parseUrl.exec('://username:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash'),
-	  [ '://username:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash',
-	    '://', 'username', 'password', 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ] ],
-
-	[ ll.Dispatch.parseUrl.exec('username:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash'),
-	  [ 'username:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash',
-	    empty, 'username', 'password', 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ] ],
-	[ ll.Dispatch.parseUrl.exec('hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash'),
-	  [ 'hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash',
-	    empty, empty, empty, 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ] ],
-	[ ll.Dispatch.parseUrl.exec('/pathname/dir/file.ext?search=query&key=value#hash'),
-	  [ '/pathname/dir/file.ext?search=query&key=value#hash',
-	    empty, empty, empty, empty, empty, '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ] ],
-	[ ll.Dispatch.parseUrl.exec('?search=query&key=value#hash'),
-	  [ '?search=query&key=value#hash',
-	    empty, empty, empty, empty, empty, empty, '?search=query&key=value', '#hash' ] ],
-	[ ll.Dispatch.parseUrl.exec('#hash'),
-	  [ '#hash',
-	    empty, empty, empty, empty, empty, empty, empty, '#hash' ] ]
-]);
+		reg_test([ 'username:password@hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash',
+				   empty, 'username', 'password', 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ]),
+		reg_test([ 'hostname.tld:80/pathname/dir/file.ext?search=query&key=value#hash',
+				   empty, empty, empty, 'hostname.tld', '80', '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ]),
+		reg_test([ '/pathname/dir/file.ext?search=query&key=value#hash',
+				   empty, empty, empty, empty, empty, '/pathname/dir/file.ext', '?search=query&key=value', '#hash' ]),
+		reg_test([ '?search=query&key=value#hash',
+				   empty, empty, empty, empty, empty, empty, '?search=query&key=value', '#hash' ]),
+		reg_test([ '#hash',
+				   empty, empty, empty, empty, empty, empty, empty, '#hash' ])
+	];
+});
 
 utest('ll.Dispatch', [
 	function () {

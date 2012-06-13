@@ -1,4 +1,5 @@
 utest('ll.type', [
+	[ utest.type(ll), "function" ],
 	function () {
 		return [[ ll.type(void 0), 'undefined' ]];
 	},

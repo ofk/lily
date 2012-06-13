@@ -1,10 +1,12 @@
 utest("ll", [
+	[ typeof ll, '!==', 'undefined' ],
 	[ utest.type(ll), "function" ],
-
-	raises(function () { ll(); }),
-	function () { ll({}); return true; },
-	function () { new ll({}); return true; },
-	function () { var Test = ll({}); new Test; return true; }
+	raise(function () { ll(); }),
+	safe(function () { ll({}); }),
+	safe(function () { new ll({}); }),
+	safe(function () { var Test = ll({}); new Test; }),
+	raise(function () { (new ll({})).method(); })
+	// safe(function () { (new ll({ method: function () {} })).method(); })
 ]);
 
 utest("ll(Animal, Human, Singer)", function () {
@@ -18,7 +20,11 @@ utest("ll(Animal, Human, Singer)", function () {
 	});
 	var Singer = ll(Human, {
 		speak: function () { return 'hello!!'; },
-		sing: function () { var str = []; for (var i = 0; i < 3; ++i) str.push(this.parent('sing')()); return str.join(' '); }
+		sing: function () {
+			var str = [];
+			for (var i = 0; i < 3; ++i) str.push(this.parent('sing')());
+			return str.join(' ');
+		}
 	});
 	var ofk = new Human('k');
 	var lily = new Singer('yuri');
@@ -154,7 +160,7 @@ utest("ll(Class1, Class2, Class3, Class4, Class5)", function () {
 	function method_test(obj_num, method_name, val_arr) {
 		var msg = "Class" + obj_num + "#" + method_name + "() @ " + (i + 1);
 		if (!val_arr) {
-			res[msg] = raises(function () { obj[obj_num - 1][method_name](0); });
+			res[msg] = raise(function () { obj[obj_num - 1][method_name](0); });
 		}
 		else {
 			res[msg] = function () {
@@ -162,7 +168,7 @@ utest("ll(Class1, Class2, Class3, Class4, Class5)", function () {
 			};
 		}
 	}
-	for (var i = 0; i < 3; ++i) {
+	for (; i < 3; ++i) {
 		// Class1
 		method_test(1, "prop", [ 1, 0, 0, 0, 0 ]);
 		method_test(1, "lv____5");

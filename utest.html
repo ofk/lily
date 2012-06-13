@@ -8,7 +8,19 @@
 <script src="https://raw.github.com/ofk/utest/master/utest.js"></script>
 <script src="lily.js"></script>
 <script>
-function raises(fn) { try { fn(); } catch (e) { return true; } return false; }
+function safe(fn) {
+  return function () {
+    fn();
+    return true;
+  };
+}
+function raise(fn) {
+  return function () {
+    try { fn(); }
+    catch (e) { return true; }
+    return false;
+  };
+}
 </script>
 <script src="utest/ll.js"></script>
 <script src="utest/ll.type.js"></script>
