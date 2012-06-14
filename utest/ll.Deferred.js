@@ -418,7 +418,7 @@ utest('ll.Deferred.wait', [
 		   .then(function (ms) { p.push(2); test([ms, '>=', 1900]); test([ms, '<=', 2100]); });
 		test([ p, [] ]);
 		test([ p, [1] ], 1000);
-		test([ p, [1,2] ], 3000);
+		test([ p, [1,2] ], 5000);
 	},
 	function (test) {
 		var p = [];
@@ -601,24 +601,12 @@ utest('ll.Deferred.each', [
 	},
 	function (test) {
 		var p = [];
-		dfr.each([ 1, 23, 456, 7890 ], function (v) { p.push(v||null); })
-		   .then(function () { p.push(2); });
-		test([ p, [1,23,456,7890,2] ], 1000);
-	},
-	function (test) {
-		var p = [];
-		dfr.each([ 1, 23, 456, 7890 ], function (v) { p.push(v||null); })
-		   .each([ 1, 23, 456, 7890 ], function (v) { p.push(v*2); })
-		   .each([ 1, 23, 456, 7890 ], function (v) { p.push(v*3); });
-		test([ p, [1,23,456,7890,1*2,23*2,456*2,7890*2,1*3,23*3,456*3,7890*3] ], 1000);
-	},
-	function (test) {
-		var p = [];
 		dfr.each([ 1, 1, 1, 1, 1,
 		           1, 1, 1, 1, 1,
 		           1, 1, 1, 1, 1,
 		           1, 1, 1, 1, 1,
-		           1, 1, 1, 1, 1 ], function (v, i) { p.push(v||null); return false; })
+		           1, 1, 1, 1, 1 ],
+				 function (v, i) { p.push(v||null); return false; })
 		   .lose(function () { p.push(2); })
 		   .then(function () { p.push(3); });
 		test([ p, [1,2,3] ], 1000);
@@ -629,7 +617,12 @@ utest('ll.Deferred.each', [
 		           1, 1, 1, 1, 1,
 		           1, 1, 1, 1, 1,
 		           1, 1, 1, 1, 1,
-		           1, 1, 1, 1, 1 ], function (v, i) { p.push(v||null); if (i === 24) return false; })
+		           1, 1, 1, 1, 1 ],
+				 function (v, i) {
+					 p.push(v||null);
+					 if (i === 24) return false;
+					 return void 0;
+				 })
 		   .lose(function () { p.push(2); })
 		   .then(function () { p.push(3); });
 		test([ p, [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,3] ], 1000);
@@ -640,7 +633,8 @@ utest('ll.Deferred.each', [
 		           1, 1, 1, 1, 1,
 		           1, 1, 1, 1, 1,
 		           1, 1, 1, 1, 1,
-		           1, 1, 1, 1, 1 ], function (v, i) { p.push(v||null); return false; })
+		           1, 1, 1, 1, 1 ],
+				 function (v, i) { p.push(v||null); return false; })
 		   .then(function () { p.push(3); });
 		test([ p, [1,3] ], 1000);
 	},
@@ -650,12 +644,42 @@ utest('ll.Deferred.each', [
 		           1, 1, 1, 1, 1,
 		           1, 1, 1, 1, 1,
 		           1, 1, 1, 1, 1,
-		           1, 1, 1, 1, 1 ], function (v, i) { p.push(v||null); if (i === 24) return false; })
+		           1, 1, 1, 1, 1 ],
+				 function (v, i) {
+					 p.push(v||null);
+					 if (i === 24) return false;
+					 return void 0;
+				 })
 		   .then(function () { p.push(3); });
 		test([ p, [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3] ], 1000);
 	}
 ]);
 
-//utest('ll.Deferred.loop', [
-//	
-//]);
+utest('ll.Deferred.loop', [
+	function (test) {
+		var p = [];
+		dfr.loop(4, function (v) { p.push(v==null?null:v); })
+		   .then(function () { p.push(-1); });
+		test([ p, [0,1,2,3,-1] ], 1000);
+	},
+	function (test) {
+		var p = [];
+		dfr.loop(4, function (v) { p.push(v==null?null:v); })
+		   .lose(function () { p.push(-2); })
+		   .then(function () { p.push(-1); });
+		test([ p, [0,1,2,3,-1] ], 1000);
+	},
+	function (test) {
+		var p = [];
+		dfr.loop(4, function (v) { p.push(v); })
+		   .loop(4, function (v) { p.push(v*2); })
+		   .loop(4, function (v) { p.push(v*3); });
+		test([ p, [0,1,2,3,0*2,1*2,2*2,3*2,0*3,1*3,2*3,3*3] ], 1000);
+	},
+	function (test) {
+		var p = [];
+		dfr.each([ 1, 23, 456, 7890 ], function (v) { p.push(v||null); })
+		   .then(function () { p.push(2); });
+		test([ p, [1,23,456,7890,2] ], 1000);
+	}
+]);
