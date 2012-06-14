@@ -34,10 +34,10 @@ var ll = (function () { //< Expose ll to the global object
 	// -----------------------------------------------------------------------------
 	// All public classes and functions will be attached to the ll.
 
-	llmerge(ll, {
+	llextend(ll, {
 		log:      lllog,
 		type:     lltype,
-		merge:    llmerge,
+		extend:   llextend,
 		each:     lleach,
 		Event:    llEvent,
 		KVObject: llKVObject,
@@ -285,29 +285,29 @@ var ll = (function () { //< Expose ll to the global object
 	}
 
 	/**
-	 * Merge contents of arguments, put together into the first object.
+	 * Extend contents of arguments, put together into the first object.
 	 *
 	 * @example
-	 * ll.merge({ 1: "ichi", 2: "nii" }, { 1: "one", 3: "three" });
+	 * ll.extend({ 1: "ichi", 2: "nii" }, { 1: "one", 3: "three" });
 	 *   // { 1: "one", 2: "nii", 3: "three" }
 	 *
 	 * @methodOf ll
-	 * @name merge
-	 * @param {Object} src A first object to merge, altered.
-	 * @param {Object} Subsequent objects to merge into the first, unaltered.
+	 * @name extend
+	 * @param {Object} src A first object to extend, altered.
+	 * @param {Object} Subsequent objects to extend into the first, unaltered.
 	 * @returns {Object} The altered first object. (first argument)
 	 */
-	function llmerge(src) {
+	function llextend(src) {
 		// Undefined and null don't have a property
 		// Replace an empty object
 		if (src == null) {
 			src = {};
 		}
 
-		// Merge the contents of arguments
+		// Extend the contents of arguments
 		for (var args = arguments, i = 1, iz = args.length; i < iz; ++i) {
 			var dst = args[i];
-			// Merge into the first objects
+			// Extend into the first objects
 			if (dst != null) {
 				for (var j in dst) {
 					src[j] = dst[j];
@@ -396,7 +396,7 @@ var ll = (function () { //< Expose ll to the global object
 	 */
 	function llEvent() {}
 
-	llmerge(llEvent, /** @lends ll.Event */ {
+	llextend(llEvent, /** @lends ll.Event */ {
 		/**
 		 * Create a function to be able to manage handlers.
 		 *
@@ -512,7 +512,7 @@ var ll = (function () { //< Expose ll to the global object
 		}
 	});
 
-	llmerge(llEvent.prototype, /** @lends ll.Event# */ {
+	llextend(llEvent.prototype, /** @lends ll.Event# */ {
 		/**
 		 * Attach a handler on the name to a function.
 		 *
@@ -658,7 +658,7 @@ var ll = (function () { //< Expose ll to the global object
 		kvo.call('_notify' + name);
 	}
 
-	llmerge(llKVObject.prototype, /** @lends ll.KVObject# */ {
+	llextend(llKVObject.prototype, /** @lends ll.KVObject# */ {
 		/**
 		 * Get a property value.
 		 *
@@ -927,7 +927,7 @@ var ll = (function () { //< Expose ll to the global object
 	}
 
 
-	llmerge(llDispatch.prototype, /** @lends ll.Dispatch# */ {
+	llextend(llDispatch.prototype, /** @lends ll.Dispatch# */ {
 		/**
 		 * Update the URL data.
 		 *
@@ -1028,7 +1028,7 @@ var ll = (function () { //< Expose ll to the global object
 				}
 
 				if (m) {
-					llmerge(loc, {
+					llextend(loc, {
 						protocol: m[1] || '',
 						hostname: m[4] || '',
 						port:     m[5] || '',
@@ -1038,7 +1038,7 @@ var ll = (function () { //< Expose ll to the global object
 					});
 				}
 				else {
-					loc = llmerge({}, loc);
+					loc = llextend({}, loc);
 				}
 
 				// Set a default name.
@@ -1218,7 +1218,7 @@ var ll = (function () { //< Expose ll to the global object
 	// not support (use ll.Deferred.delay)
 	null;
 
-	llmerge(llDeferred.prototype, /** @lends ll.Deferred# */ {
+	llextend(llDeferred.prototype, /** @lends ll.Deferred# */ {
 		/**
 		 * Invokes a function of the object itself.
 		 *
@@ -1472,7 +1472,7 @@ var ll = (function () { //< Expose ll to the global object
 		 * @returns {ll.Deferred} The new deferred object.
 		 */
 		_for: function _for(opt, arr, fn) {
-			opt = llmerge(null, opt);
+			opt = llextend(null, opt);
 
 			// Casting arguments
 			var	start = +opt.start || 0, end = +opt.end, step = +opt.step || 1, time = +opt.time || 0;
