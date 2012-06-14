@@ -99,7 +99,6 @@ var ll = (function () { //< Expose ll to the global object
 			}
 
 			// calls same method as its caller but in the superclass
-			var parentDef = new ParentClass;
 			ClassProto.parent = function parent(name) {
 				// methods cache
 				parent._proto_cache || (parent._proto_cache = {});
